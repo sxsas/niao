@@ -1,27 +1,48 @@
-/**
- * Created by dell on 2016/8/23.
- */
-(function(w){
-    function getImage(objimg,cb){
-        if(!objimg.length){
-            throw 'û��length';
+(function (w) {
+
+    // 根据用户传入path来获取图像资源
+    function getImage(pathObj, cbk) {
+
+        if (!pathObj.length) {
+            throw '没有传length属性，不干了！！！';
         }
-        var obj={},img,conten=0;
-        for(var key in objimg){
-            if(key=='length'){
+
+        var imgObj = {}, img, count = 0;
+
+        // 把所有的路径遍历出来，
+        // 然后根据这些路径创建不同的图片对象，
+        // 然后把这些图片对象存储到imgObj里，
+        // 当所有的图片加载完毕时，
+        // 把imgObj传给回调函数，供其使用。
+        for (var key in pathObj) {
+
+            // 过滤掉length，因为length不是路径
+            if (key === 'length') {
                 continue;
             }
-            img=new Image();
-            img.src=objimg[key];
-            obj[key]=img;
-            img.addEventListener('load',function(){
-                conten++;
-                if(conten>=objimg.length){
-                    cb(obj);
-                }
 
-            })
+            // 创建图片对象，并指定其路径
+            img = new Image();
+            img.src = pathObj[key];
+
+            // 分别给不同的img绑定load事件，
+            // 每一张图片加载完毕之后都会让count自增一次，
+            // 当count的值等于pathObj中路径的数量，
+            // 那么证明所有的图片已经加载完毕了，
+            // 可以把这些图像资源传给使用者了
+            img.addEventListener('load', function () {
+                count++;
+                if (count >= pathObj.length) {
+                    cbk(imgObj);
+                }
+            });
+
+            // 把新创建的图片对象，存储到imgObj里
+            imgObj[key] = img;
         }
     }
-    w.getImage=getImage;
-})(window)
+
+    // 把getImage暴漏到全局
+    w.getImage = getImage;
+
+})(window);

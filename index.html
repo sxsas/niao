@@ -1,42 +1,104 @@
 <!DOCTYPE html>
-<html>
-<head lang="en">
+<html lang="en">
+<head>
     <meta charset="UTF-8">
-    <title></title>
+    <title>Title</title>
+
 </head>
 <body>
-<canvas id="cvs" width="800" height="600" style="border: 1px solid red;"></canvas>
+<canvas id="cvs" width="800" height="600" style="border:1px solid red;"></canvas>
+<script src="js/tool.js"></script>
 <script src="js/getImage.js"></script>
-<script src="js/sky.js"></script>
+<script src="js/sky2.js"></script>
+<script src="js/land2.js"></script>
+<!--<script src="js/pipeup2.js"></script>-->
+<script src="js/bird2.js"></script>
+<script src="js/pipe.js"></script>
+<script src="js/text.js"></script>
+<script src="js/datatext.js"></script>
+
 <script>
-    (function(){
-        var cvs=document.getElementById('cvs');
-        var ctx=cvs.getContext('2d');
-        var imgs={
-            sky:'./imgs/sky.png',
-            birds:'./imgs/birds.png',
-            land:'./imgs/land.png',
-            pipeDown:'./imgs/pipeDown.png',
-            pipeUp:'./imgs/pipeUp.png',
-            length:5
+
+    ( function(){
+
+
+    var cvs = document.getElementById('cvs');
+    var ctx = cvs.getContext('2d');
+
+    var imgPaths = {
+        sky: './imgs/sky.png',
+        land: './imgs/land.png',
+        pipeup: './imgs/pipeUp.png',
+        pipedown: './imgs/pipeDown.png',
+        birds: './imgs/birds.png',
+        length: 5
+    };
+
+    function main(imgs) {
+        var sky1 = new sky(ctx, imgs.sky);
+        var sky2 = new sky(ctx, imgs.sky, imgs.sky.width);
+
+        var bird = new niao(ctx, imgs.birds,0,0)
+
+
+        var pipes=[];
+        for(var i=0;i<6;i++){
+            pipes.push(new Pipe(ctx,imgs.pipedown,imgs.pipeup,300 + 3*imgs.pipedown.width*i))
         }
-        function main(imgs){
-            var sky=new Sky(ctx,imgs.sky);
-            var sky2=new Sky(ctx,imgs.sky,imgs.sky.width);
-            setInterval(function(){
-                ctx.clearRect(0,0,cvs.width,cvs.height);
-                sky.draw();
-                sky2.draw();
-                sky.update();
-                sky2.update();
-            },20)
+        var lands=[];
+        for (var i = 0; i < 5; i++) {
+            lands.push( new land(ctx, imgs.land, imgs.land.width * i,  cvs.height - imgs.land.height) )
 
         }
-        getImage(imgs,main)
-    }())
+
+        var gamestarttime=Date.now();
+        var text=new dataText(ctx,gamestarttime,cvs.width,0,'red','right','top');
+
+      var timer=  setInterval(function () {
+          var birdCx=bird.x+bird.width/2;
+          var birdCy=bird.y+bird.height/2;
+
+//          var gameruntime=Date.now()-gamestarttime;
+//          var hours = Math.floor(gameruntime / (1000 * 60 * 60));
+//          var minutes = Math.floor(gameruntime % (1000 * 60 * 60) / (1000 * 60));
+//          var seconds = Math.floor(gameruntime % (1000 * 60) / 1000);
+//          text.text='坚持了'+hours+'小时'+minutes+'分钟'+seconds+'秒';
+
+          if(birdCy<0||birdCy>cvs.height-imgs.land.height||ctx.isPointInPath(birdCx,birdCy)){
+              clearInterval(timer);
+          }
+            ctx.clearRect(0, 0, cvs.width, cvs.height);
 
 
+            sky1.draw();
+            sky2.draw();
+            sky1.updata();
+            sky2.updata();
 
+            ctx.beginPath();
+            pipes.forEach(function(pipe){
+                pipe.draw();
+                pipe.update();
+            })
+
+
+            lands.forEach(function(land){
+                land.draw();
+                land.updata();
+            })
+
+
+            bird.draw();
+            bird.updata();
+
+
+            text.draw();
+          text.update();
+
+        }, 30)
+    }
+        getImage(imgPaths,main);
+    }());
 </script>
 </body>
 </html>

@@ -1,8 +1,11 @@
 /**
- * Created by dell on 2016/8/23.
+ * Created by dell on 2016/8/21.
+ */
+/**
+ * Created by dell on 2016/8/21.
  */
 (function(w){
-    function Sky (ctx,img,x,y,speed){
+    function land(ctx,img,x,y,speed){
         this.ctx=ctx;
         this.img=img;
         this.width=img.width;
@@ -11,14 +14,14 @@
         this.y=y||0;
         this.speed=speed||2;
     }
-    Sky.prototype.draw=function(){
+    land.prototype.draw=function(){
         this.ctx.drawImage(this.img,this.x,this.y)
     }
-    Sky.prototype.update=function(){
-        this.x-=this.speed;
+    land.prototype.updata=function(){
+        this.x=this.x-this.speed;
         if(this.x<=-this.width){
-            this.x=this.width;
+            this.x=this.x+this.width*4;
         }
     }
-    w.Sky=Sky;
+    w.land=land;
 })(window)
